@@ -4,9 +4,19 @@ module.exports = {
     execute(message, alanQ, con){
         if (alanQ === ('sad')) {
             //TODO Impliment SQL Hygeine
-            const appCheck = message.content.toString();
-            const userInput = appCheck.replace("'","`");
+            let userInput = message.content.toString();
+            userInput = userInput.replace("'","`");
+
+            const sqlSanitizationRegex = new RegExp(/[\t\r\n]|(--[^\r\n]*)|(\/\*[\w\W]*?(?=\*)\*\/)/gi);
+            const isInjectionDetected = sqlSanitizationRegex.test(userInput);
+            console.log(isInjectionDetected);
             
+            if (isInjectionDetected){
+                console.log('SQL Injection Detected. Stop That!');
+                throw new Error(`SQL INJECTION ATTEMPT BY ACCOUNT ${message.author}`);
+            }
+
+
             const userSuggestion = userInput.substring(userInput.lastIndexOf("sad") + 4); 
             console.log(`Record Inserted: ${userSuggestion}`);
             
