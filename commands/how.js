@@ -1,35 +1,51 @@
+const howResponses = require('../resources/howResponses.js');
+
 module.exports = {
     name: 'how',
     description: 'Sql random query in how table ',
 
-
 //DESPERATELY NEEDS TO BE REDONE
-
     execute(message, alanQ, con){
         if (alanQ === ('how')){ 
-            //sql count
-            const sqlA = "SELECT COUNT(*) as total FROM response";
 
-            con.query(sqlA, function (err, result) {
-            
-                //Subroutine for counting fields
-                if (err) throw err;
-                    var resultCount = result.map(({total}) => +total);
-                //takes sql row value and generates random number with that as ceiling.
-                        var randAlan = Math.floor(Math.random() * resultCount + 1);
-                            console.log(randAlan);
+            const sqlCountQuery = "SELECT COUNT(*) as total FROM response";
 
-                //sub subroutine its getting wacky
+            con.query(sqlCountQuery, function (err, count) {
+                if (err) {
+                    throw err; 
+                }
 
-                var sqlB = "SELECT respSTR FROM response WHERE respID = " + randAlan + ";";
-                    con.query(sqlB, function (errB, resultB) {
-                            if (err) throw errB;
-                            var string = JSON.stringify(resultB);
-                            var json = JSON.parse(string);
-                        var alanSadMessage = json[0].respSTR; // sad msg variable is the parsed string 
+                const resultCount = count.map(({total}) => +total);
+                const randAlan = Math.floor(Math.random() * resultCount + 1);
 
-                        // change this to match number of cases // random message clause 
-                        var alanSadMessageCase = Math.floor(Math.random()* 14 + 1);
+                const sqlSelectQuery = "SELECT respSTR FROM response WHERE respID = " + randAlan + ";";
+                con.query(sqlSelectQuery, function (err, response) {
+                    if (err) {
+                        throw err; 
+                    }
+
+                    const sadMessage = JSON.parse(JSON.stringify(response))[0].respSTR;
+                    const sadMessageSplit = sadMessage.split('');
+
+                    const isPlural = sadMessageSplit[sadMessageSplit.length - 1] === 's';
+
+                    const randomResponseID = Math.floor(Math.random() * (Object.keys(howResponses).length - 1));
+
+                    let responseString = null;
+
+                    console.log(sadMessage);
+
+                    const reasonRegex = new RegExp(/%\w+%/g)
+
+                    if(isPlural && howResponses[`${randomResponseID}`]['plural']){
+                        responseString = howResponses[`${randomResponseID}`]['plural'];
+                        responseString = responseString.replace(reasonRegex, sadMessage);
+                        message.channel.send(responseString);
+                    } else{
+                        responseString = howResponses[`${randomResponseID}`]['singular'];
+                        responseString = responseString.replace(reasonRegex, sadMessage);
+                        message.channel.send(responseString);
+                    }
             } 	
             )}
         )}

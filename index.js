@@ -33,15 +33,12 @@ const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith(
 for(const file of commandFiles){
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
-	console.log(client.commands);
 }
 
 //log into console once ready with discord.
 client.once('ready', () =>{console.log('Alanbot is sad. but online.');});
 
 client.on('message', message =>{
-	console.log(message);
-	
 //On message event -> Define commands.
 	const args = message.content.toLowerCase().slice(prefix.length).split();
 	const command = args.shift().toLowerCase();
