@@ -5,4 +5,4 @@ Alan is a Discord bot that responds to user queries with data from a SQL databas
 ## Features
 
 - Responds to the question "How are you?" and fetches data from a SQL database.
-- Allows users to contribute to the SQL database using the "alan sad 'x'" command.
+- Allows users to contribute to the SQL database using the "alan sad 'x'" command
